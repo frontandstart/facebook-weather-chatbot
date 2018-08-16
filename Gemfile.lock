@@ -198,6 +198,7 @@ DEPENDENCIES
   dotenv-rails
   facebook-messenger
   hamlit-rails
+  httparty
   jbuilder (~> 2.5)
   listen (>= 3.0.5, < 3.2)
   mongoid

@@ -3,4 +3,6 @@ class Message
   belongs_to :user
   field :body # we just store params[:entry][:messaging] json
   
+
+
 end
