@@ -3,4 +3,8 @@ Rails.application.routes.draw do
 
   get '/facebook-messenger', to: 'users#facebook_messenger'
   post '/facebook-messenger', to: 'users#facebook_messenger'
+
+  get '/tos', to: 'users#tos'
+  get '/tos', to: 'users#user_agreement'
+
 end
