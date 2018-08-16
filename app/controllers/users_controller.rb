@@ -7,8 +7,7 @@ class UsersController < ApplicationController
   def facebook_messenger
     facebook_id = params[:entry][0][:messaging][0][:sender][:id]
     user = User.find_or_create_by(facebook_id: facebook_id)
-    message = Message.create( body: params[:entry][0][:messaging][0][:message][:text] )
-    message.user = user
+    Message.create( body: params[:entry][0][:messaging][0][:message][:text], user: user )
     if message.save
       render json: 'ok', status: 200
     else
