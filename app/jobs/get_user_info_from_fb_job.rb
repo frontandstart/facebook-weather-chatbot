@@ -7,7 +7,7 @@ class GetUserInfoFromFbJob < ApplicationJob
     user.update(first_name: response[:first_name] , last_name: response[:last_name], profile_pic: response[:profile_pic])
 
     SendFbMessageJob.perform_later(user.facebook_id, "Hello #{user.full_name}!")
-    ShareLocationJob.wait(1.second).perform_later(user.facebook_id, "I'm a weather bot, please share your location with me")
+    ShareLocationJob.set(wait: 1.second).perform_later(user.facebook_id, "I'm a weather bot, please share your location with me")
   end
 end
 
