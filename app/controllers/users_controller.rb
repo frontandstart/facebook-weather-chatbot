@@ -14,6 +14,12 @@ class UsersController < ApplicationController
     render json: 'ok', status: 200
   end
 
+  def tos
+  end
+
+  def user_agreement
+  end
+
   protected 
 
   def check_fb_marker
@@ -21,3 +27,4 @@ class UsersController < ApplicationController
   end
 
 end
+
