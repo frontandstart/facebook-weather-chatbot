@@ -1,7 +1,7 @@
 class SendFbMessageJob < ApplicationJob
   queue_as :default
 
-  def perform(facebook_id, message_text, after_response_job)
+  def perform(facebook_id, message_text)
     HTTParty.post( ENV['FB_API_PATH'] + '/me/messages',  
       query: { access_token: ENV['FACEBOOK_MARKER_TESTIAMPOPUP_MESSENGER'] },
       body: {
@@ -14,6 +14,5 @@ class SendFbMessageJob < ApplicationJob
       },
       headers: {'Content-Type'=>'application/json'}
     )
-    after_response_job if after_response_job.present?
   end
 end
