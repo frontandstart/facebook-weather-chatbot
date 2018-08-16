@@ -10,7 +10,7 @@ class User
   after_create :get_data_from_facebook
 
   def get_data_from_facebook
-    GetUserInfoFromFbJob.perform_later(self)
+    GetUserInfoFromFbJob.perform_later(id)
   end
 
   def get_fb_info_path

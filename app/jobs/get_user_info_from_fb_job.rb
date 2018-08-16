@@ -1,8 +1,9 @@
 class GetUserInfoFromFbJob < ApplicationJob
   queue_as :default
 
-  def perform(user)
-    # Do something later
+  def perform(user_id)
+    user = User.find_by(id: user_id)
+
     response = JSON.parse HTTParty.get( user.get_fb_info_path, format: :plain), symbolize_names: true
     user.update(first_name: response.first_name , last_name: response.last_name, profile_pic: response.profile_pic)
     
@@ -13,7 +14,7 @@ class GetUserInfoFromFbJob < ApplicationJob
         },
         message: 
         "Hello #{user.full_name}\n
-         Are you ok?"
+        Are you ok?"
       
       }
     )
