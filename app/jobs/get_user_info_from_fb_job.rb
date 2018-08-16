@@ -13,7 +13,7 @@ class GetUserInfoFromFbJob < ApplicationJob
           id: facebook_id
         },
         message: 
-        "Hello #{user.users_name}\n
+        "Hello #{user.first_name}\n
         I'm a weather bot, please share your location with me"
       
       }

@@ -15,7 +15,7 @@ class User
     user = self
     response = JSON.parse HTTParty.get( user.get_fb_info_path, format: :plain), symbolize_names: true
     logger.debug "response: #{response}"
-    user.update(first_name: response[:first_nam] , last_name: response[:last_name], profile_pic: response[:profile_pic])
+    user.update(first_name: response[:first_name] , last_name: response[:last_name], profile_pic: response[:profile_pic])
     
     HTTParty.post( user.send_messsage_to_user_path,
       body: {
@@ -23,7 +23,7 @@ class User
           id: facebook_id
         },
         message: 
-        "Hello #{user.users_name}\n
+        "Hello #{user.first_name}\n
         I'm a weather bot, please share your location with me"
       
       }
