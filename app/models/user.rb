@@ -14,7 +14,8 @@ class User
     #user = User.find_by(facebook_id: facebook_id)
     user = self
     response = JSON.parse HTTParty.get( user.get_fb_info_path, format: :plain), symbolize_names: true
-    user.update(first_name: response.first_name , last_name: response.last_name, profile_pic: response.profile_pic)
+    logger.debug "response: #{response}"
+    user.update(first_name: response[:first_nam] , last_name: response[:last_name], profile_pic: response[:profile_pic])
     
     HTTParty.post( user.send_messsage_to_user_path,
       body: {
