@@ -2,6 +2,7 @@ class UsersController < ApplicationController
   # ENV['FACEBOOK_CONFIRMATION_MARKER']
   # ENV['FACEBOOK_MARKER_TESTIAMPOPUP_MESSENGER'] api kqye to make an API calls
   before_action :check_fb_marker, only: :facebook_messenger
+  skip_before_action :verify_authenticity_token, only: :facebook_messenger
 
   def facebook_messenger
     messaging_body = params[:entry][0][:messaging][0]
