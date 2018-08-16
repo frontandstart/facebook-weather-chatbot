@@ -1,5 +1,6 @@
 class User
   include Mongoid::Document
-  field :location
+  field :facebook_id
+  embeds_many :messages
 
 end
