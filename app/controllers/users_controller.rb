@@ -4,13 +4,15 @@ class UsersController < ApplicationController
   before_action :check_fb_marker, only: :facebook_messenger
 
   def facebook_messenger
-    facebook_id = params[:entry][0][:messaging][0][:sender][:id]
+    messaging_body = params[:entry][0][:messaging][0]
+    facebook_id = messaging_body[:sender][:id]
     user = User.find_or_create_by(facebook_id: facebook_id)
+    Rails.logger.debug "messaging_body: #{messaging_body}"
     message = Message.create(
-      body: params[:entry][0][:messaging][0]
+      body: messaging_body
     )
     user.messages << message
-
+    user.save!
     render json: 'ok', status: 200
   end
 
