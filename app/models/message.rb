@@ -1,6 +1,6 @@
 class Message
   include Mongoid::Document
-  has_one :user
+  belongs_to :user
   field :body # we just store params[:entry][:messaging] json
 
 end
