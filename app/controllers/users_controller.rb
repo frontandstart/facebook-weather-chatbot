@@ -12,7 +12,7 @@ class UsersController < ApplicationController
       body: messaging_body
     )
     user.messages << message
-    user.save!
+    user.save
     render json: 'ok', status: 200
   end
 
