@@ -7,7 +7,7 @@ class UsersController < ApplicationController
   def facebook_messenger
     facebook_id = params[:entry][0][:messaging][0][:sender][:id]
     user = User.find_or_create_by(facebook_id: facebook_id)
-    logger.debug "params[:entry][0][:messaging][0] #{params[:entry][0][:messaging][0]}"
+    logger.debug "params[:entry][0][:messaging][0] #{params[:entry][0][:messaging][0].inspect}"
     message = Message.create( body: params[:entry][0][:messaging][0] )
     message.user = user
     if message.save
