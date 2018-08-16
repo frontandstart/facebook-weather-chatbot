@@ -5,9 +5,8 @@ class UsersController < ApplicationController
   #skip_before_action :verify_authenticity_token, only: :facebook_messenger
 
   def facebook_messenger
-    facebook_id = params[:entry][0][:messaging][0][:sender][:id]
-    user = User.find_or_create_by(facebook_id: facebook_id)
-    Message.create( body: params[:entry][0][:messaging][0][:message][:text], user: user )
+    user = User.find_or_create_by(facebook_id: params[:entry][0][:messaging][0][:sender][:id])
+    message = Message.create( body: params[:entry][0][:messaging][0][:message][:text], user: user )
     if message.save
       render json: 'ok', status: 200
     else
