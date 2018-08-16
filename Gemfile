@@ -9,6 +9,7 @@ gem 'rails', '~> 5.2.1'
 gem 'puma', '~> 3.11'
 gem 'mongoid'
 gem 'hamlit-rails'
+gem 'sidekiq'
 #gem 'pg'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.5'

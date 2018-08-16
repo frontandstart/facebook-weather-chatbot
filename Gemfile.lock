@@ -69,6 +69,7 @@ GEM
       capistrano-bundler
       puma (~> 3.4)
     concurrent-ruby (1.0.5)
+    connection_pool (2.2.2)
     crass (1.0.4)
     dotenv (2.5.0)
     dotenv-rails (2.5.0)
@@ -129,6 +130,8 @@ GEM
       mini_portile2 (~> 2.3.0)
     puma (3.12.0)
     rack (2.0.5)
+    rack-protection (2.0.3)
+      rack
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
     rails (5.2.1)
@@ -159,7 +162,12 @@ GEM
     rb-fsevent (0.10.3)
     rb-inotify (0.9.10)
       ffi (>= 0.5.0, < 2)
+    redis (4.0.2)
     ruby_dep (1.5.0)
+    sidekiq (5.2.1)
+      connection_pool (~> 2.2, >= 2.2.2)
+      rack-protection (>= 1.5.0)
+      redis (>= 3.3.5, < 5)
     spring (2.0.2)
       activesupport (>= 4.2)
     spring-watcher-listen (2.0.1)
@@ -204,6 +212,7 @@ DEPENDENCIES
   mongoid
   puma (~> 3.11)
   rails (~> 5.2.1)
+  sidekiq
   spring
   spring-watcher-listen (~> 2.0.0)
   tzinfo-data
