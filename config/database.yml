@@ -1,0 +1,19 @@
+
+development:
+  adapter: postgresql
+  encoding: unicode
+  database: iampopup_dev
+  pool: 5
+
+
+test:
+  adapter: postgresql
+  encoding: unicode
+  database: iampopup_test
+  pool: 5
+
+production:
+  adapter: postgresql
+  encoding: unicode
+  database: iampopup_production
+  pool: 10

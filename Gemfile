@@ -7,7 +7,8 @@ ruby '2.5.1'
 gem 'rails', '~> 5.2.1'
 # Use Puma as the app server
 gem 'puma', '~> 3.11'
-gem 'mongoid'
+#gem 'mongoid'
+gem 'pg'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 # gem 'jbuilder', '~> 2.5'
 # Use Redis adapter to run Action Cable in production
@@ -35,7 +36,8 @@ group :development do
   gem 'capistrano-rails'
   gem 'capistrano-rvm'
   gem 'capistrano-bundler'
-  gem 'capistrano-puma'
+  gem 'capistrano3-puma'
+
 end
 
 
