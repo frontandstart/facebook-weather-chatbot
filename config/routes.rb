@@ -5,6 +5,6 @@ Rails.application.routes.draw do
   post '/facebook-messenger', to: 'users#facebook_messenger'
 
   get '/tos', to: 'users#tos'
-  get '/tos', to: 'users#user_agreement'
+  get '/user_agreement', to: 'users#user_agreement'
 
 end

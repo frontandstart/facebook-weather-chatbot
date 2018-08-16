@@ -1,6 +1,7 @@
 class User
   include Mongoid::Document
   field :facebook_id, type: Integer
-  has_many :messages
+  embeds_many :messages, cascade_callbacks: true
+
 
 end

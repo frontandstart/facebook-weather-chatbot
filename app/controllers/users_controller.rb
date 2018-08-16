@@ -8,11 +8,9 @@ class UsersController < ApplicationController
     facebook_id = messaging_body[:sender][:id]
     user = User.find_or_create_by(facebook_id: facebook_id)
     Rails.logger.debug "messaging_body: #{messaging_body}"
-    message = Message.create(
-      body: messaging_body
-    )
-    user.messages << message
-    user.save
+    message = Message.create( body: messaging_body )
+    message.user = user
+    message.save
     render json: 'ok', status: 200
   end
 
