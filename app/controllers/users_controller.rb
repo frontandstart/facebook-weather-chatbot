@@ -11,7 +11,7 @@ class UsersController < ApplicationController
     )
     user.messages << message
 
-    #render json: params['hub.challenge'], status: 200
+    render json: 'ok', status: 200
   end
 
   protected 
