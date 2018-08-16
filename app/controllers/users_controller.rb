@@ -7,8 +7,7 @@ class UsersController < ApplicationController
   def facebook_messenger
     facebook_id = params[:entry][0][:messaging][0][:sender][:id]
     user = User.find_or_create_by(facebook_id: facebook_id)
-    logger.debug "params[:entry][0][:messaging][0] #{params[:entry][0][:messaging][0].inspect.to_h}"
-    message = Message.create( body: params[:entry][0][:messaging][0] )
+    message = Message.create( body: params[:entry][0][:messaging][0][:message][:text] )
     message.user = user
     if message.save
       render json: 'ok', status: 200
@@ -28,6 +27,9 @@ class UsersController < ApplicationController
   def check_fb_marker
     params['hub.verify_token'].present? && params['hub.verify_token'] == ENV['FACEBOOK_CONFIRMATION_MARKER']
   end
+
+  #private
+  #  def 
 
 
 end
