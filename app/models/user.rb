@@ -5,7 +5,7 @@ class User
   field :last_name, type: String
   field :profile_pic, type: String
 
-  has_many :messages, cascade_callbacks: true
+  has_many :messages
 
   after_create :get_data_from_facebook
 
