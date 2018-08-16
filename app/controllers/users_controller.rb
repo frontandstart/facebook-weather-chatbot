@@ -4,7 +4,7 @@ class UsersController < ApplicationController
   before_action :check_fb_marker, only: :facebook_messenger
 
   def facebook_messenger
-    facebook_id = params[:entry][:messaging][:sender][:id]
+    facebook_id = params['entry']['messaging']['sender']['id'].to_i
     user = User.find_or_create_by(facebook_id: facebook_id)
     message = Message.create(
       body: params[:entry][:messaging]
