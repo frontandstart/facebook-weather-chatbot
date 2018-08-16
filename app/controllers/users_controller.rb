@@ -7,7 +7,7 @@ class UsersController < ApplicationController
     facebook_id = params[:entry][0][:messaging][0][:sender][:id]
     user = User.find_or_create_by(facebook_id: facebook_id)
     message = Message.create(
-      body: params[:entry][:messaging][0]
+      body: params[:entry][0][:messaging][0]
     )
     user.messages << message
 
