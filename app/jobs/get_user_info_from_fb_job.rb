@@ -1,8 +1,8 @@
 class GetUserInfoFromFbJob < ApplicationJob
   queue_as :default
 
-  def perform(user_id)
-    user = User.find_by(id: user_id)
+  def perform(facebook_id)
+    user = User.find_by(facebook_id: facebook_id)
 
     response = JSON.parse HTTParty.get( user.get_fb_info_path, format: :plain), symbolize_names: true
     user.update(first_name: response.first_name , last_name: response.last_name, profile_pic: response.profile_pic)
@@ -10,7 +10,7 @@ class GetUserInfoFromFbJob < ApplicationJob
     HTTParty.post( user.send_messsage_to_user_path,
       body: {
         recipient: {
-          id: user.facebook_id
+          id: facebook_id
         },
         message: 
         "Hello #{user.full_name}\n
