@@ -5,7 +5,7 @@ class User
   field :last_name, type: String
   field :profile_pic, type: String
 
-  has_many :messages
+  has_many :messages, inverse_of: :user
 
   after_create :get_data_from_facebook
 
