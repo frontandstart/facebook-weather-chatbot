@@ -9,6 +9,8 @@ class GetUserInfoFromFbJob < ApplicationJob
       last_name: response[:last_name],
       profile_pic: response[:profile_pic]
     )
+    #to be sure tahat we have data in DB of we can check after_update if first_name was blank in Rail dirty methods 
+    user.reload
     SendFbMessageJob.perform_later(
       user.facebook_id, 
       {
