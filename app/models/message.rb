@@ -6,19 +6,20 @@ class Message
   after_create :response_to_user_or_update_data
   
   def response_to_user_or_update_data
-    if self.location_message?
-      coordinates = body[:attachments][0][:payload][:coordinates]
-      self.user.update(
-        lat: coordinates[:lat],
-        long: coordinates[:long]
-      ) and return
+    if location_message?
+      coordinates = body['attachments'][0]['payload']['coordinates']
+      user.update(
+        lat: coordinates['lat'],
+        long: coordinates['long']
+      )
+      return
     end
 
-    if self.weather_report?
+    if weather_report?
 
     end
 
-    if self.weather_subscribtion_report?
+    if weather_subscribtion_report?
 
     end
   end
@@ -33,7 +34,7 @@ class Message
   end
 
   def location_message?
-    body[:attachments].present? && body[:attachments][0][:type] == 'location'
+    body['message']['attachments'].present? && body['message']['attachments'][0]['type'] == 'location' ? true : false
   end
 
 
