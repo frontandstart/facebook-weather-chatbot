@@ -2,15 +2,17 @@ class UsersController < ApplicationController
   # ENV['FACEBOOK_CONFIRMATION_MARKER']
   # ENV['FACEBOOK_MARKER_TESTIAMPOPUP_MESSENGER'] api kqye to make an API calls
   before_action :check_fb_marker, only: :facebook_messenger
-  #skip_before_action :verify_authenticity_token, only: :facebook_messenger
-
+  before_action :set_sender, only: :facebook_messenger
+  
   def facebook_messenger
-    user = User.find_or_create_by(facebook_id: params[:entry][0][:messaging][0][:sender][:id])
-    message = Message.create( body: params[:entry][0][:messaging][0][:message][:text], user: user )
+    message = Message.create(
+      user: @sender,
+      body: params[:entry][0][:messaging][0][:message] #store all hash
+    )
     if message.save
       render json: 'ok', status: 200
     else
-      render json: '', status: 500 
+      render json: '', status: 100 
     end
   end
 
@@ -22,13 +24,13 @@ class UsersController < ApplicationController
 
   protected 
 
+  def set_sender
+    @sender = User.find_or_create_by(facebook_id: params[:entry][0][:messaging][0][:sender][:id]) 
+  end
+
   def check_fb_marker
     params['hub.verify_token'].present? && params['hub.verify_token'] == ENV['FACEBOOK_CONFIRMATION_MARKER']
   end
-
-  #private
-  #  def 
-
 
 end
 

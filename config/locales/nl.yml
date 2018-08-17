@@ -1,4 +1,4 @@
-en:
+nl:
   bot: 
     greeting_html: |
       Hello %{username}<br>
