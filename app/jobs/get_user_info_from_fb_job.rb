@@ -12,7 +12,7 @@ class GetUserInfoFromFbJob < ApplicationJob
     SendFbMessageJob.perform_later(
       user.facebook_id, 
       {
-        text: I18n.t('bot.greeting_html', username: user.full_name)
+        text: I18n.t('bot.greeting_html', username: user.full_name),
         quick_replies: [{ "content_type": "location" }]
       }
     )
