@@ -1,7 +1,7 @@
 class Message
   include Mongoid::Document
   embedded_in :user
-  field :body # we just store params[:entry][:messaging] json
+  field :body, type: Hash # we just store params[:entry][:messaging] json
 
   after_create :response_to_user_or_update_data
   
@@ -25,11 +25,11 @@ class Message
 
 
   def weather_report?
-    
+    return false
   end
 
   def weather_subscribtion_report?
-
+    return false
   end
 
   def location_message?
