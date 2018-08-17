@@ -1,5 +1,5 @@
 en:
   bot: 
     greeting_html: |
-      Hello %{username}<br>
+      Hello %{username}
       I'm a weather bot, please share your location with me.
