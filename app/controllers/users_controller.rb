@@ -7,7 +7,7 @@ class UsersController < ApplicationController
   def facebook_messenger
     message = Message.create(
       user: @sender,
-      body: params[:entry][0][:messaging][0][:message] #store all hash
+      body: request.params[:entry][0][:messaging][0][:message] 
     )
     if message.save
       render json: 'ok', status: 200

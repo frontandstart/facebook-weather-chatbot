@@ -4,6 +4,8 @@ class User
   field :first_name, type: String
   field :last_name, type: String
   field :profile_pic, type: String
+  filed :long, type: String
+  filed :lat, type: String
 
   embeds_many :messages
 
