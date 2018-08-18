@@ -10,10 +10,10 @@ class GetUserInfoFromFbJob < ApplicationJob
       profile_pic: response[:profile_pic]
     )
     SendFbMessageJob.perform_later(
-      user.facebook_id, 
+      user.facebook_id,
       {
         text: I18n.t('bot.greeting_html', username: response[:first_name]),
-        quick_replies: [{ "content_type": "location" }]
+        quick_replies: [{ 'content_type': 'location' }]
       }
     )
   end

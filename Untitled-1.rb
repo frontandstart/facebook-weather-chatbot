@@ -33,3 +33,29 @@ HTTParty.post( ENV['FB_API_PATH'] + 'me/messenger_profile',
   headers: {'Content-Type' => 'application/json'}
 )
 
+
+{
+  "object"=>"page", 
+  "entry"=>[
+    {
+      "id"=>"308568613245530",
+      "time"=>1534535405986,
+      "messaging"=>[
+        {
+          "recipient"=>{
+            "id"=>"308568613245530"
+          },
+          "timestamp"=>1534535405986,
+          "sender"=>{
+            "id"=>"1993628157343502"
+          },
+          "postback"=>{
+            "payload"=>"weather_report",
+            "title"=>"Weather Report"
+          }
+        }
+      ]
+    }
+  ], 
+  "user"=>{}
+}

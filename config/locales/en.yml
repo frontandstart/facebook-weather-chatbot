@@ -3,3 +3,11 @@ en:
     greeting_html: |
       Hello %{username}
       I'm a weather bot, please share your location with me.
+    
+    edit_location: |
+      Ok, send to us your new location...
+
+    weather_report: |
+      Wether in %{current_location_name} is %{temparture} °C.
+
+    have_no_coordinated: "You don't set location yet"
