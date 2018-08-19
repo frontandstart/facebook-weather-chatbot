@@ -6,12 +6,7 @@ class Message
   after_create :check_message_type
 
   def check_message_type
-    %i( weather_report 
-        edit_location 
-        location_message
-        subscribe_weather_report 
-        unsubscribe_weather_report
-        parse_message).each do |action_name|
+    %w(weather_report edit_location location_message subscribe_weather_report unsubscribe_weather_report parse_message).each do |action_name|
       if self.send("#{action_name}?")
         self.send(action_name) and return
       end
