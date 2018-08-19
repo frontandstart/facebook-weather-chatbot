@@ -1,14 +1,22 @@
 class Message
   include Mongoid::Document
   embedded_in :user
-  field :body, type: Hash # we just store params[:entry][:messaging] json
+  field :body, type: Hash #store params[:entry][:messaging] json
 
-  after_create :weather_report, if: :weather_report?
-  after_create :edit_location, if: :edit_location?
-  after_create :location_message, if: :location_message?
-  after_create :subscribe_weather_report, if: :subscribe_weather_report?
-  after_create :unsubscribe_weather_report, if: :unsubscribe_weather_report?
-  after_create :parse_message, if: :plain_text?
+  after_create :check_message_type
+
+  def check_message_type
+    %i( weather_report 
+        edit_location 
+        location_message
+        subscribe_weather_report 
+        unsubscribe_weather_report
+        parse_message).each do |action_name|
+      if self.send("#{action_name}?")
+        self.send(action_name) and return
+      end
+    end
+  end
 
   def weather_report
     SendFbMessageJob.perform_later( user.facebook_id, { text: I18n.t('bot.have_no_coordinated')} ) and return if user.lat.blank? || user.long.blank?
@@ -48,38 +56,28 @@ class Message
     user.unsubscribe_weather_report!
   end
 
-  def location_message?
-    body['message'] && body['message']['attachments'] && body['message']['attachments'][0]['type'] == 'location'
-  end
-
   def postback
     body['postback']
   end
 
-  def weather_report?
-    postback['payload'] == 'weather_report' if postback
-  end
-
-  def edit_location?
-    postback['payload'] == 'edit_location' if postback
-  end
-
-  def subscribe_weather_report?
-    postback['payload'] == 'subscribe_weather_report' if postback
-  end
-
-  def unsubscribe_weather_report?
-    postback['payload'] == 'unsubscribe_weather_report' if postback
-  end
-  
-  def parse_message
-    msg = body['message']['text'].delete(' ').downcase 
-    weather_report and return if %w(weatherreport wetherreport).include? msg
-    edit_location and return if msg == 'editlocation'
+  %w(weather_report edit_location subscribe_weather_report unsubscribe_weather_report).each do |name|
+    define_method("#{name}?".to_sym) do
+      postback['payload'] == name if postback
+    end
   end
 
   def plain_text?
     body['message'] && body['message']['text']
+  end
+
+  def location_message?
+    body['message'] && body['message']['attachments'] && body['message']['attachments'][0]['type'] == 'location'
+  end
+   
+  def plain_text
+    msg = body['message']['text'].delete(' ').downcase 
+    weather_report and return if %w(weatherreport wetherreport).include? msg
+    edit_location and return if msg == 'editlocation'
   end
 
 end
