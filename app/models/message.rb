@@ -78,11 +78,8 @@ class Message
     edit_location and return if msg == 'editlocation'
   end
 
-
   def plain_text?
     body['message'] && body['message']['text']
   end
 
-  # plaintext {"object"=>"page", "entry"=>[{"id"=>"308568613245530", "time"=>1534631450180, "messaging"=>[{"sender"=>{"id"=>"1993628157343502"}, "recipient"=>{"id"=>"308568613245530"}, "timestamp"=>1534631449185, "message"=>{"mid"=>"B0EAtU_SqoSFrg5p0V4b1z-WTHjaW7EfQrZ8tBv68ogy0oMbNSXRGZZr2fnrfv4i662HOy-0i-oj9hOCP_q8nA", "seq"=>26444, "text"=>"Weather report"}}]}], "user"=>{}}  
-  # postback payload {"id"=>"308568613245530", "time"=>1534598024220, "messaging"=>[{"recipient"=>{"id"=>"308568613245530"}, "timestamp"=>1534598024220, "sender"=>{"id"=>"1993628157343502"}, "postback"=>{"payload"=>"weather_report", "title"=>"Weather Report"}}]}
 end

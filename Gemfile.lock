@@ -71,14 +71,7 @@ GEM
     concurrent-ruby (1.0.5)
     connection_pool (2.2.2)
     crass (1.0.4)
-    dotenv (2.5.0)
-    dotenv-rails (2.5.0)
-      dotenv (= 2.5.0)
-      railties (>= 3.2, < 6.0)
     erubi (1.7.1)
-    facebook-messenger (1.1.1)
-      httparty (~> 0.13, >= 0.13.7)
-      rack (>= 1.4.5)
     ffi (1.9.25)
     globalid (0.4.1)
       activesupport (>= 4.2.0)
@@ -203,8 +196,6 @@ DEPENDENCIES
   capistrano-rails
   capistrano-rvm
   capistrano3-puma
-  dotenv-rails
-  facebook-messenger
   hamlit-rails
   httparty
   jbuilder (~> 2.5)
