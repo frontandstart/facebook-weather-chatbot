@@ -1,12 +1,17 @@
 class Message
   include Mongoid::Document
   embedded_in :user
-  field :body, type: Hash #store params[:entry][:messaging] json
+  field :body, type: Hash
 
   after_create :check_message_type
 
   def check_message_type
-    %w(weather_report edit_location location_message subscribe_weather_report unsubscribe_weather_report parse_message).each do |action_name|
+    %w[weather_report
+      edit_location
+      location_message
+      subscribe_weather_report
+      unsubscribe_weather_report
+      parse_message].each do |action_name|
       if self.send("#{action_name}?")
         self.send(action_name) and return
       end
@@ -16,7 +21,7 @@ class Message
   def weather_report
     SendFbMessageJob.perform_later( user.facebook_id, { text: I18n.t('bot.have_no_coordinated')} ) and return if user.lat.blank? || user.long.blank?
 
-    temperature = user.temperature_need_to_updated? ? user.get_weather_from_api : user.current_temperature
+    temperature = user.temperature_need_to_updated? ? user.weather_from_api : user.current_temperature
     SendFbMessageJob.perform_later(
       user.facebook_id,
       { 
@@ -55,7 +60,10 @@ class Message
     body['postback']
   end
 
-  %w(weather_report edit_location subscribe_weather_report unsubscribe_weather_report).each do |name|
+  %w[weather_report
+    edit_location
+    subscribe_weather_report
+    unsubscribe_weather_report].each do |name|
     define_method("#{name}?".to_sym) do
       postback['payload'] == name if postback
     end

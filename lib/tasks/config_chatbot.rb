@@ -1,20 +1,26 @@
-namespace :config do
+# frozen_string_literal: true
 
+namespace :config_chatbot do
   desc 'Setup chatbot menu'
-
-  task chatbot: :environment do 
-    HTTParty.post( ENV['FB_API_PATH'] + '/me/messenger_profile',  
-      query: { access_token: ENV['FACEBOOK_MARKER_TESTIAMPOPUP_MESSENGER'] },
+  task get_started: :environment do
+    HTTParty.post(
+      "#{ENV['FB_API_PATH']}me/messenger_profile",
+      query: {
+        access_token: ENV['FACEBOOK_MARKER_TESTIAMPOPUP_MESSENGER']
+      },
       body: {
         get_started: {
           payload: 'get_started'
-        }   
+        }
       }.to_json,
-      headers: { 'Content-Type'=>'application/json' }
+      headers: { 'Content-Type' => 'application/json' }
     )
-    
-    HTTParty.post( ENV['FB_API_PATH'] + 'me/messenger_profile',  
-      query: { access_token: ENV['FACEBOOK_MARKER_TESTIAMPOPUP_MESSENGER'] },
+  task get_started: :environment do
+    HTTParty.post(
+      "#{ENV['FB_API_PATH']}me/messenger_profile",
+      query: {
+        access_token: ENV['FACEBOOK_MARKER_TESTIAMPOPUP_MESSENGER']
+      },
       body: {
         persistent_menu: [
           {
@@ -38,5 +44,4 @@ namespace :config do
       headers: { 'Content-Type' => 'application/json' }
     )
   end
-
 end

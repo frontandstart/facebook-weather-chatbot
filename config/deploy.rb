@@ -1,5 +1,5 @@
 # config valid for current version and patch releases of Capistrano
-lock "~> 3.11.0"
+lock '~> 3.11.0'
 
 set :application, 'iampopup.rubyvkube.ru'
 set :repo_url, 'git@gitlab.com:frontandstart/iampopup.git'
@@ -24,7 +24,7 @@ set :deploy_to, "/home/#{fetch(:user)}/#{fetch(:application)}"
 # append :linked_files, "config/database.yml"
 
 # Default value for linked_dirs is []
-append :linked_dirs, "log", "tmp/pids", "tmp/cache", "tmp/sockets", "public/system", 'public/.well-known'
+append :linked_dirs, 'log', 'tmp/pids', 'tmp/cache', 'tmp/sockets', 'public/system', 'public/.well-known'
 
 # Default value for default_env is {}
 # set :default_env, { path: "/opt/ruby/bin:$PATH" }
