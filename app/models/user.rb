@@ -10,58 +10,83 @@ class User
   field :lat, type: String
   field :daily_weather_report, type: Boolean
 
-  field :current_temperature, type: Float
-  field :current_temperature_update_at, type: DateTime
-  field :current_location_name, type: String
+  field :temperature, type: Float
+  field :temperature_update_at, type: DateTime
+  field :location_name, type: String
 
   embeds_many :messages
 
-  after_create :data_from_facebook
-  after_update :weather_from_api, if: :temperature_need_to_updated?
-
-  def data_from_facebook
-    GetUserInfoFromFbJob.perform_later(self)
-  end
-
-  def fb_info_path
-    "#{ENV['FB_API_PATH']}/#{facebook_id}?access_token=#{ENV['FACEBOOK_MARKER_TESTIAMPOPUP_MESSENGER']}" 
-  end
-
-  def send_messsage_to_user_path
-    "#{ENV['FB_API_PATH']}/me/messages?access_token=#{ENV['FACEBOOK_MARKER_TESTIAMPOPUP_MESSENGER']}"
-  end
+  after_create GetUserInfoFromFbJob.perform_later(facebook_id)
+  after_update :get_weather_from_api, if: :temperature_need_to_update?
 
   def full_name
     "#{first_name} #{last_name}"
   end
 
+  def update_location(coordinates)
+    # coordinates is hash with lat and long keys
+    user.update(
+      lat: coordinates['lat'],
+      long: coordinates['long']
+    )
+  end
+
+  def edit_location
+    SendFbMessageJob.perform_later(
+      user.facebook_id, 
+      {
+        text: I18n.t('bot.edit_location'),
+        quick_replies: [{ "content_type": "location" }]
+      }
+    )
+  end
+
   def subscribe_weather_report!
-    user.update(daily_weather_report: true)
+    update(daily_weather_report: true)
   end
 
   def unsubscribe_weather_report!
-    user.update(daily_weather_report: false)
+    update(daily_weather_report: false)
   end
     
-  def temperature_need_to_updated?
-    ( lat.present? && long.present? ) && (
-      ( current_temperature.blank? || current_temperature_update_at < Time.now - 10.minutes) || 
-      ( lat_changed? || long_changed? ) 
+  def temperature_need_to_update?
+    location_present? && temperature_expired_or_blank? || location_changed?
+  end
+
+  def location_changed?
+    lat_changed? || long_changed?
+  end
+
+  def location_blank?
+    lat.blank? || long.blank?
+  end
+
+  def location_present?
+    !location_blank?
+  end
+
+  def temperature_expired_or_blank?
+    temperature.blank? || temperature_update_at < Time.now - 10.minutes
+  end
+
+  def set_temperature(t)
+    self.update(
+      temperature: t,
+      temperature_update_at: Time.now
+    )    
+  end
+
+
+  def weather_report!
+    SendFbMessageJob.perform_later( user.facebook_id, { text: I18n.t('bot.have_no_coordinated')} ) and return if user.
+    temperature = user.temperature_need_to_update? ? user.weather_from_api : user.temperature
+    SendFbMessageJob.perform_later(
+      user.facebook_id,
+      { 
+        text: I18n.t( 'bot.weather_report', location_name: user.location_name, temparture: temperature.to_s,  ) 
+      }
     )
   end
 
-  def weather_from_api
-    response = HTTParty.get(
-      "#{ENV['WEATHER_API_PATH']}?lat=#{self.lat}&lon=#{self.long}&APPID=#{ENV['WEATHER_KEY']}",
-      headers: { 'Content-Type' => 'application/json' }
-    )
-    temperature = (response['list'].last['main']['temp'].to_f - 273.15).round(2)
-    self.update(
-      current_temperature: temperature,
-      current_temperature_update_at: Time.now,
-      current_location_name: response['city']['name']
-    )
-    temperature
-  end
 
 end
