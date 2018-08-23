@@ -76,6 +76,7 @@ class Message
     msg = body['message']['text'].delete(' ').downcase 
     weather_report and return if %w(weatherreport wetherreport).include? msg
     edit_location and return if msg == 'editlocation'
+    SendFbMessageJob.perform_later(facebook_id, {text: 'test_response'}) if msg == 'test'
   end
 
   def plain_text?
