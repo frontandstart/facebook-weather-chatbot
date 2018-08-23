@@ -44,10 +44,15 @@ class User
   end
     
   def temperature_need_to_updated?
-    ( lat.present? && long.present? ) && (
-      ( current_temperature.blank? || current_temperature_update_at < Time.now - 10.minutes) || 
-      ( lat_changed? || long_changed? ) 
-    )
+    (lat.present? && long.present?) && (current_temperature_expired_or_blank? || location_changed?)
+  end
+
+  def location_changed?
+    lat_changed? || long_changed?
+  end
+
+  def current_temperature_expired_or_blank?
+    current_temperature.blank? || current_temperature_update_at < Time.now - 10.minutes
   end
 
   def get_weather_from_api
@@ -57,7 +62,6 @@ class User
       headers: {'Content-Type' => 'application/json'}
     )
     temperature = (response['list'].last['main']['temp'].to_f - 273.15 ).round(2)
-    self.update_columns(current_temperature: temperature, current_temperature_update_at: Time.now, current_location_name: response['city']['name'] )
     return temperature
   end
 
