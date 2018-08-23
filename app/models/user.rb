@@ -57,7 +57,7 @@ class User
       headers: {'Content-Type' => 'application/json'}
     )
     temperature = (response['list'].last['main']['temp'].to_f - 273.15 ).round(2)
-    self.update(current_temperature: temperature, current_temperature_update_at: Time.now, current_location_name: response['city']['name'] )
+    self.update_columns(current_temperature: temperature, current_temperature_update_at: Time.now, current_location_name: response['city']['name'] )
     return temperature
   end
 
