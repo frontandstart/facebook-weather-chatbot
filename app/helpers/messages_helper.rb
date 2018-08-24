@@ -5,6 +5,6 @@ module MessagesHelper
     Message::CATEGORIES.each do |category|
       return category if category == text
     end
-    return nil
+    nil
   end
 end

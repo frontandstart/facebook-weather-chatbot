@@ -40,7 +40,12 @@ class User
   end
     
   def need_update_temperature?
-    location_present? && ( temperature_expired_or_blank? || location_changed? )
+    location_present? && temperature_expired_or_blank? || location_changed?
+  end
+
+  def temperature_expired_or_blank?
+    # Do not need to update weather if request came from same location less than 5 min
+    temperature.blank? || temperature_update_at < Time.now - 5.minutes
   end
 
   def location_changed?
@@ -55,22 +60,19 @@ class User
     !location_blank?
   end
 
-  def temperature_expired_or_blank?
-    # Do not need to update weather if request came from same location less than 5 min
-    temperature.blank? || temperature_update_at < Time.now - 5.minutes
-  end
-
   def update_temperature(t, location)
     update(
       temperature: t,
       location_name: location,
-      temperature_update_at: Time.now)   
+      temperature_update_at: Time.now
+    )
   end
 
   def update_location(lat, long)
     update(
       lat: lat,
-      long: long)
+      long: long
+    )
   end
 
   def update_user_info_from_fb(response)
@@ -81,12 +83,8 @@ class User
     )
   end
 
-  def fb_info_path
-    "#{ENV['FB_API_PATH']}/#{facebook_id}?access_token=#{ENV['FACEBOOK_MARKER_TESTIAMPOPUP_MESSENGER']}" 
-  end
-
   def weather_message!(temp, name)
-    # i did it becouse sometime DB update can be slowed than Sidekiq job taht sending sessage
+    # i did it becouse sometime DB update can be slower than Sidekiq job that sending sessage
     temp ||= temperature
     name ||= location_name
     SendFbMessageJob.perform_later(
@@ -96,6 +94,5 @@ class User
       }
     )
   end
-
 
 end
