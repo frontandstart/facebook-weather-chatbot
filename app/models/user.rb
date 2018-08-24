@@ -9,7 +9,6 @@ class User
   field :long, type: String
   field :lat, type: String
   field :daily_weather_report, type: Boolean
-
   field :temperature, type: Float
   field :temperature_update_at, type: DateTime
   field :location_name, type: String
@@ -17,21 +16,10 @@ class User
   embeds_many :messages
 
   after_create GetUserInfoFromFbJob.perform_later(facebook_id)
-
-  after_update :get_weather_from_api, if: :need_update_temperature?
+  after_update WeatherRequestJob.perform_later(self, false), if: :location_changed?
 
   def full_name
     "#{first_name} #{last_name}"
-  end
-
-  def edit_location
-    SendFbMessageJob.perform_later(
-      user.facebook_id, 
-      {
-        text: I18n.t('bot.edit_location'),
-        quick_replies: [{ "content_type": "location" }]
-      }
-    )
   end
 
   def subscribe_weather_report!
@@ -74,15 +62,6 @@ class User
     update(
       lat: coordinates['lat'],
       long: coordinates['long'])
-  end
-
-  def send_temperature!
-    SendFbMessageJob.perform_later(
-      facebook_id,
-      {
-        text: I18n.t( 'bot.weather_report', location_name: location_name, temparture: temperature.to_s )
-      }
-    )
   end
 
 end

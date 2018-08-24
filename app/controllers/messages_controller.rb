@@ -2,13 +2,13 @@ class MessagesController < ApplicationController
   before_action :set_sender_and_message_type, only: :facebook_messenger
   
   def facebook_messenger
-    AnswerJob.perform_later(@sender, @type)
-    Message.create(
+    message = Message.new(
       user: @sender,
       body: @messaging,
       type: @type
     )
     if message.save
+      AnswerJob.perform_later(@sender, @type)
       render json: { success: true }, status: 200
     else
       render json: { success: false }, status: 100

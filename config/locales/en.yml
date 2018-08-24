@@ -11,3 +11,5 @@ en:
       Wether in %{location_name} is %{temparture} °C.
 
     have_no_coordinated: "You don't set location yet"
+
+    cant_get_weather_data: "Sorry, we can't get current wather. Try repeat later"
