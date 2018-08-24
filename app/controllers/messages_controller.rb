@@ -17,6 +17,7 @@ class MessagesController < ApplicationController
   end
 
   def tos; end
+
   def user_agreement; end
 
   protected

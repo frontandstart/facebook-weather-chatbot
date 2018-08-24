@@ -10,13 +10,13 @@ class Message
   after_create :make_response
 
   CATEGORIES = %w[get_started
-                weather_report
-                edit_location
-                location
-                subscribe_weather_report
-                unsubscribe_weather_report
-                test
-                not_found]
+                  weather_report
+                  edit_location
+                  location
+                  subscribe_weather_report
+                  unsubscribe_weather_report
+                  test
+                  not_found]
 
   def make_response
     AnswerJob.perform_later(self)
@@ -35,10 +35,8 @@ class Message
     if user.location_blank?
       SendFbMessageJob.perform_later(
         user.facebook_id,
-        {
-          text: I18n.t('bot.have_no_coordinated')
-        }
-      ) and return
+        { text: I18n.t('bot.have_no_coordinated') }
+      ) && return
     end
     if user.need_update_temperature?
       WeatherRequestJob.perform_later(user.facebook_id, true)
@@ -49,10 +47,10 @@ class Message
 
   def edit_location_response
     SendFbMessageJob.perform_later(
-      user.facebook_id, 
+      user.facebook_id,
       {
         text: I18n.t('bot.edit_location'),
-        quick_replies: [{ "content_type": "location" }]
+        quick_replies: [{ 'content_type': 'location' }]
       }
     )
   end
