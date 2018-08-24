@@ -1,23 +1,30 @@
 class Message
   include Mongoid::Document
-  embedded_in :user
+  include Mongoid::Timestamps
+  include GlobalID::Identification
+
+  belongs_to :user
   field :body, type: Hash
-  field :type, type: String
-  field :answered, type: Boolean, default: true
+  field :category, type: String
+  field :answered, type: Boolean
+  after_create :make_response
 
-  after_create AnswerJob.perform_later("#{type}_response")
+  CATEGORIES = %w[get_started
+                weather_report
+                edit_location
+                location
+                subscribe_weather_report
+                unsubscribe_weather_report
+                test
+                not_found]
 
-  TYPES = %w[get_started
-            weather_report
-            edit_location
-            location
-            subscribe_weather_report
-            unsubscribe_weather_report
-            test]
-
+  def make_response
+    AnswerJob.perform_later(self)
+  end
 
   def location_response
-    user.update_location(body['message']['attachments'][0]['payload']['coordinates'])
+    coordinates = body['message']['attachments'][0]['payload']['coordinates']
+    user.update_location(coordinates['lat'], coordinates['long'])
   end
 
   def get_started_response
@@ -33,11 +40,10 @@ class Message
         }
       ) and return
     end
-
-    if user.need_update_temperature? 
-      WeatherRequestJob.perform_later(user, true)
+    if user.need_update_temperature?
+      WeatherRequestJob.perform_later(user.facebook_id, true)
     else
-      weather_message(user.facebook_id, user.location_name, user.temperature.to_s)
+      user.weather_message!(nil, nil) # it's bad idia
     end
   end
 
@@ -56,7 +62,7 @@ class Message
   end
 
   def unsubscribe_weather_report_response
-  user.unsubscribe_weather_report!
+    user.unsubscribe_weather_report!
   end
 
   def test_response
@@ -68,16 +74,8 @@ class Message
     )
   end
 
-
-  def self.weather_message(facebook_id, location, temp)
-    SendFbMessageJob.perform_later(
-      facebook_id,
-      {
-        text: I18n.t( 'bot.weather_report', location_name: location, temparture: temp.to_s )
-      }
-    )  
+  def not_found_response
+    Rails.logger.debug "Type of message, not found: #{self.inspect}"
   end
 
-
 end
-

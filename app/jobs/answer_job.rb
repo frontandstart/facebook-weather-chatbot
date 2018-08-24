@@ -1,8 +1,9 @@
 class AnswerJob < ApplicationJob
   queue_as :default
 
-  def perform(type_response)
-    message.send(type_response) if message.respond_to?(type_response)
+  def perform(message)
+    response_type = "#{message.category}_response"
+    message.send(response_type) if message.respond_to?(response_type)
   end
 
 end

@@ -1,14 +1,15 @@
 class MessagesController < ApplicationController
+  include MessagesHelper
+
   before_action :set_sender_and_message_type, only: :facebook_messenger
   
   def facebook_messenger
     message = Message.new(
       user: @sender,
       body: @messaging,
-      type: @type
+      category: find_category
     )
     if message.save
-      AnswerJob.perform_later(@sender, @type)
       render json: { success: true }, status: 200
     else
       render json: { success: false }, status: 100
@@ -23,7 +24,10 @@ class MessagesController < ApplicationController
   def set_sender_and_message_type
     @messaging = request.params[:entry][0][:messaging][0]
     @sender = User.find_or_create_by(facebook_id: @messaging[:sender][:id])
-    @type = find_type(postback) || find_type(location) || find_type(plaintext)
+  end
+
+  def find_category
+    parse_body_for(postback) || parse_body_for(location) || parse_body_for(plaintext) || 'not_found'
   end
 
   def postback
