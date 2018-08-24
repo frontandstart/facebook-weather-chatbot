@@ -86,6 +86,7 @@ class User
   end
 
   def weather_message!(temp, name)
+    # i did it becouse sometime DB update can be slowed than Sidekiq job taht sending sessage
     temp ||= temperature
     name ||= location_name
     SendFbMessageJob.perform_later(
