@@ -33,11 +33,11 @@ class MessagesController < ApplicationController
   def plaintext
     @messaging['message'] && @messaging['message']['text']
   end
-  
+
   def location
     @messaging['message'] && @messaging['message']['attachments'] && @messaging['message']['attachments'][0]['type']
   end
-   
+ 
   def check_fb_marker
     params.dig('hub.verify_token') == ENV['FACEBOOK_CONFIRMATION_MARKER']
   end

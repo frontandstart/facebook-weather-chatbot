@@ -15,6 +15,7 @@ namespace :config_chatbot do
       }.to_json,
       headers: { 'Content-Type' => 'application/json' }
     )
+  end
   task get_started: :environment do
     HTTParty.post(
       "#{ENV['FB_API_PATH']}me/messenger_profile",

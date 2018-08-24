@@ -24,7 +24,7 @@ class WeatherRequestJob < ApplicationJob
       SendFbMessageJob.perform_later(
         user.facebook_id,
         {
-          I18n.t('bot.cant_get_weather_data')
+          text: I18n.t('bot.cant_get_weather_data')
         }
       )
     end
