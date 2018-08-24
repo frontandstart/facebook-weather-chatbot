@@ -1,6 +1,7 @@
 class User
   include Mongoid::Document
   include Mongoid::Timestamps
+  include GlobalID::Identification
 
   field :facebook_id, type: Integer
   field :first_name, type: String
@@ -9,26 +10,21 @@ class User
   field :long, type: String
   field :lat, type: String
   field :daily_weather_report, type: Boolean
+  field :temperature, type: Float
+  field :temperature_update_at, type: DateTime
+  field :location_name, type: String
 
-  field :current_temperature, type: Float
-  field :current_temperature_update_at, type: DateTime
-  field :current_location_name, type: String
+  has_many :messages
 
-  embeds_many :messages
+  after_create :find_fb_user
+  after_update :weather_request, if: :need_update_temperature? 
 
-  after_create :get_data_from_facebook
-  after_update :get_weather_from_api, if: :temperature_need_to_updated?
-
-  def get_data_from_facebook
-    GetUserInfoFromFbJob.perform_later(facebook_id)
+  def find_fb_user
+    GetUserInfoFromFbJob.perform_later(self)
   end
 
-  def get_fb_info_path
-    "#{ENV['FB_API_PATH']}/#{facebook_id}?access_token=#{ENV['FACEBOOK_MARKER_TESTIAMPOPUP_MESSENGER']}" 
-  end
-
-  def send_messsage_to_user_path
-    "#{ENV['FB_API_PATH']}/me/messages?access_token=#{ENV['FACEBOOK_MARKER_TESTIAMPOPUP_MESSENGER']}"
+  def weather_request
+    WeatherRequestJob.perform_later(self.facebook_id, false)
   end
 
   def full_name
@@ -36,33 +32,70 @@ class User
   end
 
   def subscribe_weather_report!
-    user.update(daily_weather_report: true)
+    update(daily_weather_report: true)
   end
 
   def unsubscribe_weather_report!
-    user.update(daily_weather_report: false)
+    update(daily_weather_report: false)
   end
     
-  def temperature_need_to_updated?
-    (lat.present? && long.present?) && (current_temperature_expired_or_blank? || location_changed?)
+  def need_update_temperature?
+    location_present? && ( temperature_expired_or_blank? || location_changed? )
   end
 
   def location_changed?
     lat_changed? || long_changed?
   end
 
-  def current_temperature_expired_or_blank?
-    current_temperature.blank? || current_temperature_update_at < Time.now - 10.minutes
+  def location_blank?
+    lat.blank? || long.blank?
   end
 
-  def get_weather_from_api
-    # here is should be more async
-    response = HTTParty.get(
-      "#{ENV['WEATHER_API_PATH']}?lat=#{self.lat}&lon=#{self.long}&APPID=#{ENV['WEATHER_KEY']}",
-      headers: {'Content-Type' => 'application/json'}
-    )
-    temperature = (response['list'].last['main']['temp'].to_f - 273.15 ).round(2)
-    return temperature
+  def location_present?
+    !location_blank?
   end
+
+  def temperature_expired_or_blank?
+    # Do not need to update weather if request came from same location less than 5 min
+    temperature.blank? || temperature_update_at < Time.now - 5.minutes
+  end
+
+  def update_temperature(t, location)
+    update(
+      temperature: t,
+      location_name: location,
+      temperature_update_at: Time.now)   
+  end
+
+  def update_location(lat, long)
+    update(
+      lat: lat,
+      long: long)
+  end
+
+  def update_user_info_from_fb(response)
+    update(
+      first_name: response['first_name'],
+      last_name: response['last_name'],
+      profile_pic: response['profile_pic']
+    )
+  end
+
+  def fb_info_path
+    "#{ENV['FB_API_PATH']}/#{facebook_id}?access_token=#{ENV['FACEBOOK_MARKER_TESTIAMPOPUP_MESSENGER']}" 
+  end
+
+  def weather_message!(temp, name)
+    # i did it becouse sometime DB update can be slowed than Sidekiq job taht sending sessage
+    temp ||= temperature
+    name ||= location_name
+    SendFbMessageJob.perform_later(
+      facebook_id,
+      {
+        text: I18n.t( 'bot.weather_report', location_name: name, temparature: temp.to_s )
+      }
+    )
+  end
+
 
 end
