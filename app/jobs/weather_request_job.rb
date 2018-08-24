@@ -6,7 +6,7 @@ class WeatherRequestJob < ApplicationJob
       ENV['WEATHER_API_PATH'],
       query: {
         lat: user.lat,
-        lon: user.long
+        lon: user.long,
         'APPID': ENV['WEATHER_KEY'] 
       },
       headers: { 'Content-Type' => 'application/json' }
