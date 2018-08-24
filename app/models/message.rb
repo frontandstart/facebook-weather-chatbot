@@ -23,9 +23,15 @@ class Message
   end
 
   def get_started_response
+    # this is handle in User after_create decorator
   end
   
   def weather_report_response
+    if user.location_blank?
+      SendFbMessageJob.perform_later( user.facebook_id, { text: I18n.t('bot.have_no_coordinated')} ) and return
+    end
+    temperature = user.need_update_temperature? ? weather_from_api : temperature
+
   end
 
   def edit_location_response

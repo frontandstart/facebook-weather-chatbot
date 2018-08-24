@@ -17,18 +17,11 @@ class User
   embeds_many :messages
 
   after_create GetUserInfoFromFbJob.perform_later(facebook_id)
-  after_update :get_weather_from_api, if: :temperature_need_to_update?
+
+  after_update :get_weather_from_api, if: :need_update_temperature?
 
   def full_name
     "#{first_name} #{last_name}"
-  end
-
-  def update_location(coordinates)
-    # coordinates is hash with lat and long keys
-    user.update(
-      lat: coordinates['lat'],
-      long: coordinates['long']
-    )
   end
 
   def edit_location
@@ -49,8 +42,8 @@ class User
     update(daily_weather_report: false)
   end
     
-  def temperature_need_to_update?
-    location_present? && temperature_expired_or_blank? || location_changed?
+  def need_update_temperature?
+    location_present? && ( temperature_expired_or_blank? || location_changed? )
   end
 
   def location_changed?
@@ -66,27 +59,30 @@ class User
   end
 
   def temperature_expired_or_blank?
-    temperature.blank? || temperature_update_at < Time.now - 10.minutes
+    # Do not need to update weather if request came from same location less than 5 min
+    temperature.blank? || temperature_update_at < Time.now - 5.minutes
   end
 
-  def set_temperature(t)
-    self.update(
+  def update_temperature(t)
+    update(
       temperature: t,
-      temperature_update_at: Time.now
-    )    
+      temperature_update_at: Time.now)   
   end
 
+  def update_location(coordinates)
+    # coordinates is hash with lat and long keys
+    update(
+      lat: coordinates['lat'],
+      long: coordinates['long'])
+  end
 
-  def weather_report!
-    SendFbMessageJob.perform_later( user.facebook_id, { text: I18n.t('bot.have_no_coordinated')} ) and return if user.
-    temperature = user.temperature_need_to_update? ? user.weather_from_api : user.temperature
+  def send_temperature!
     SendFbMessageJob.perform_later(
-      user.facebook_id,
-      { 
-        text: I18n.t( 'bot.weather_report', location_name: user.location_name, temparture: temperature.to_s,  ) 
+      facebook_id,
+      {
+        text: I18n.t( 'bot.weather_report', location_name: location_name, temparture: temperature.to_s )
       }
     )
   end
-
 
 end
