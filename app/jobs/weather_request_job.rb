@@ -14,7 +14,6 @@ class WeatherRequestJob < ApplicationJob
     ).body
 
     Rails.logger.debug "Get weather for User: #{user.id} response: #{response}"
-    Rails.logger.debug "test str: #{response['cod']}"
 
     if response['cod'].to_i != 200
       SendFbMessageJob.perform_later(
