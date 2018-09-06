@@ -33,10 +33,24 @@ class User
 
   def subscribe_weather_report!
     update(daily_weather_report: true)
+    scheduled_weather_report(24)
+  end
+
+  def scheduled_weather_report(interval)
+    # interval is hours
+    ScheduleMessageJob.perform_at(
+      interval.hours.from_now,
+      id,
+      interval
+    )
   end
 
   def unsubscribe_weather_report!
     update(daily_weather_report: false)
+  end
+
+  def daily_weather_report?
+    daily_weather_report    
   end
     
   def need_update_temperature?
@@ -91,6 +105,15 @@ class User
       facebook_id,
       {
         text: I18n.t( 'bot.weather_report', location_name: name, temparature: temp.to_s )
+      }
+    )
+  end
+
+  def weather_message
+    SendFbMessageJob.perform_later(
+      facebook_id,
+      {
+        text: I18n.t( 'bot.weather_report', location_name: location_name, temparature: temperature.to_s )
       }
     )
   end

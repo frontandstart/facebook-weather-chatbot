@@ -19,7 +19,7 @@ class Message
                   not_found]
 
   def make_response
-    AnswerJob.perform_later(self)
+    AnswerJob.perform_later("#{category}_response")
   end
 
   def location_response
@@ -31,7 +31,8 @@ class Message
     # this is handle in User after_create decorator
   end
   
-  def weather_report_response
+  def weather_report_response(set_user = nil)
+    user ||= set_user
     if user.location_blank?
       SendFbMessageJob.perform_later(
         user.facebook_id,
