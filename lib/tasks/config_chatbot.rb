@@ -26,7 +26,17 @@ namespace :config_chatbot do
                 title: 'Edit Locationt',
                 type: 'postback',
                 payload: 'edit_location'
-              }
+              },
+              {
+                title: 'Subscribe daily report',
+                type: 'postback',
+                payload: 'subscribe_weather'
+              },
+              {
+                title: 'Subscribe daily report',
+                type: 'postback',
+                payload: 'unsubscribe_weather'
+              },
             ]
           }
         ]
