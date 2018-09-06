@@ -10,6 +10,8 @@ class User
   field :long, type: String
   field :lat, type: String
   field :daily_weather_report, type: Boolean
+  field :daily_weather_report_jid, type: String
+
   field :temperature, type: Float
   field :temperature_update_at, type: DateTime
   field :location_name, type: String
@@ -32,25 +34,24 @@ class User
   end
 
   def subscribe_weather_report!
-    update(daily_weather_report: true)
-    scheduled_weather_report(24)
+    job = ScheduleMessageJob.set(wait: 24.hours).perform_later(facebook_id)
+    Rails.logger.debug "job.provider_job_id: #{job.inspect}"
   end
 
-  def scheduled_weather_report(interval)
-    # interval is hours
-    ScheduleMessageJob.perform_at(
-      interval.hours.from_now,
-      id,
-      interval
-    )
+  def weather_report_response!
+    if location_blank?
+      SendFbMessageJob.perform_later(
+        facebook_id,
+        { text: I18n.t('bot.have_no_coordinated') }
+      ) && return
+    end
+    WeatherRequestJob.perform_later(facebook_id, true) and return if need_update_temperature?  
+    weather_message!
   end
 
   def unsubscribe_weather_report!
-    update(daily_weather_report: false)
-  end
-
-  def daily_weather_report?
-    daily_weather_report    
+    update(provider_job_id: nil)
+    Sidekiq::ScheduledSet.new.find_job([provider_job_id]).delete
   end
     
   def need_update_temperature?
@@ -97,19 +98,7 @@ class User
     )
   end
 
-  def weather_message!(temp, name)
-    # i did it becouse sometime DB update can be slower than Sidekiq job that sending sessage
-    temp ||= temperature
-    name ||= location_name
-    SendFbMessageJob.perform_later(
-      facebook_id,
-      {
-        text: I18n.t( 'bot.weather_report', location_name: name, temparature: temp.to_s )
-      }
-    )
-  end
-
-  def weather_message
+  def weather_message!
     SendFbMessageJob.perform_later(
       facebook_id,
       {

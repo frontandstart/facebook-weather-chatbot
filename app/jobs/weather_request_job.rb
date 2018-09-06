@@ -13,13 +13,10 @@ class WeatherRequestJob < ApplicationJob
       headers: { 'Content-Type' => 'application/json' }
     ).body
 
-    #Rails.logger.debug "Get weather for User: #{user.id} response: #{response}"
-    #Rails.logger.debug "test str: #{response['cod']}"
-
     if response['cod'].to_i == 200
       new_temperature = (response['main']['temp'].to_f - 273.15).round(2)
       user.update_temperature(new_temperature, response['name'])
-      user.weather_message!(new_temperature, response['name']) if need_send
+      user.reload && user.weather_message! if need_send
     else
       SendFbMessageJob.perform_later(
         facebook_id,
@@ -27,5 +24,4 @@ class WeatherRequestJob < ApplicationJob
       )
     end
   end
-
 end

@@ -13,13 +13,13 @@ class Message
                   weather_report
                   edit_location
                   location
-                  subscribe_weather_report
-                  unsubscribe_weather_report
+                  subscribe_weather
+                  unsubscribe_weather
                   test
                   not_found]
 
   def make_response
-    AnswerJob.perform_later("#{category}_response")
+    AnswerJob.perform_later(self)
   end
 
   def location_response
@@ -31,19 +31,8 @@ class Message
     # this is handle in User after_create decorator
   end
   
-  def weather_report_response(set_user = nil)
-    user ||= set_user
-    if user.location_blank?
-      SendFbMessageJob.perform_later(
-        user.facebook_id,
-        { text: I18n.t('bot.have_no_coordinated') }
-      ) && return
-    end
-    if user.need_update_temperature?
-      WeatherRequestJob.perform_later(user.facebook_id, true)
-    else
-      user.weather_message!(nil, nil) # it's bad idea
-    end
+  def weather_report_response
+    user.weather_report_response!
   end
 
   def edit_location_response
@@ -56,11 +45,11 @@ class Message
     )
   end
 
-  def subscribe_weather_report_response
+  def subscribe_weather_response
     user.subscribe_weather_report!
   end
 
-  def unsubscribe_weather_report_response
+  def unsubscribe_weather_response
     user.unsubscribe_weather_report!
   end
 
