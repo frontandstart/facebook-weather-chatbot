@@ -24,11 +24,21 @@ class MessagesController < ApplicationController
   protected
 
   def verify_facebook_request
-    require 'digest'
-    
-    Rails.logger.debug "request: #{request.inspect}"
-  end
+    get_signature = request.headers['X-Hub-Signature'] 
+    generate_signature = OpenSSL::HMAC.hexdigest(
+      'sha1',
+      ENV['FACEBOOK_APP_SECRET'],
+      request.body.read
+    )
+    Rails.logger.debug "get_signature: #{get_signature}"
+    Rails.logger.debug "generate_signature: sha1=#{generate_signature}"
 
+    unless Rack::Utils.secure_compare(get_signature, "sha1=#{generate_signature}")
+      Rails.logger.debug "Request has missmatch X-Hub-Signature header"
+      raise 'Ooops' 
+    end
+  end
+  
   def set_sender_and_message_type
     @messaging = request.params[:entry][0][:messaging][0]
     @sender = User.find_or_create_by(facebook_id: @messaging[:sender][:id])
