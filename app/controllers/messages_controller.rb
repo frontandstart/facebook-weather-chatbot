@@ -1,6 +1,7 @@
 class MessagesController < ApplicationController
   include MessagesHelper
 
+  before_action :verify_facebook_request, only: :facebook_messenger
   before_action :set_sender_and_message_type, only: :facebook_messenger
   
   def facebook_messenger
@@ -21,6 +22,12 @@ class MessagesController < ApplicationController
   def user_agreement; end
 
   protected
+
+  def verify_facebook_request
+    require 'digest'
+    
+    Rails.logger.debug "request: #{request.inspect}"
+  end
 
   def set_sender_and_message_type
     @messaging = request.params[:entry][0][:messaging][0]
