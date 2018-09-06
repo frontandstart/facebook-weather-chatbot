@@ -35,7 +35,7 @@ class MessagesController < ApplicationController
 
     unless Rack::Utils.secure_compare(get_signature, "sha1=#{generate_signature}")
       Rails.logger.debug "Request has missmatch X-Hub-Signature header"
-      render json: { success: false, message: 'This request wrong, try anoher one' }, status: 400
+      render json: { success: false, message: 'This request wrong, try anoher one' }, status: 401
       return
     end
   end
