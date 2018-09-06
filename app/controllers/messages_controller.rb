@@ -1,10 +1,10 @@
 class MessagesController < ApplicationController
   include MessagesHelper
 
-  before_action :verify_facebook_request, only: :facebook_messenger
   before_action :set_sender_and_message_type, only: :facebook_messenger
   
   def facebook_messenger
+    verify_facebook_request
     message = Message.new(
       user: @sender,
       body: @messaging,
@@ -35,7 +35,7 @@ class MessagesController < ApplicationController
 
     unless Rack::Utils.secure_compare(get_signature, "sha1=#{generate_signature}")
       Rails.logger.debug "Request has missmatch X-Hub-Signature header"
-      raise 'Ooops' 
+      render json: { success: false, message: 'This request wrong, try anoher one' }, status: 400
     end
   end
   
