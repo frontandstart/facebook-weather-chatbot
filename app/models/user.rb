@@ -1,4 +1,5 @@
 class User
+  require 'sidekiq/api'
   include Mongoid::Document
   include Mongoid::Timestamps
   include GlobalID::Identification
@@ -34,12 +35,26 @@ class User
   end
 
   def subscribe_weather_report!
-    job = ScheduleMessageJob.set(wait: 24.hours).perform_later(facebook_id)
-    update(daily_weather_report_jid: job.provider_job_id)
+    create_schedule_report_job
+  end
+
+  def unsubscribe_weather_report!
+    Sidekiq::ScheduledSet.new.find_job(daily_weather_report_jid).delete
+    update(daily_weather_report_jid: nil)
     SendFbMessageJob.perform_later(
       facebook_id,
-      I18n.t('bot.subscribtion_successfull')
+      { test: I18n.t('bot.unsubscription_successfull') }
     )
+  end
+
+  def create_schedule_report_job
+    job = ScheduleMessageJob.set(wait: 24.hours).perform_later(self)
+    update(daily_weather_report_jid: job.provider_job_id)  
+  end
+
+  def daily_weather_report_response!
+    create_schedule_report_job
+    weather_report_response!
   end
 
   def weather_report_response!
@@ -51,12 +66,6 @@ class User
     end
     WeatherRequestJob.perform_later(facebook_id, true) and return if need_update_temperature?  
     weather_message!
-  end
-
-  def unsubscribe_weather_report!
-    require 'sidekiq/api'
-    Sidekiq::ScheduledSet.new.find_job('').delete
-    update(daily_weather_report_jid: nil)
   end
     
   def need_update_temperature?

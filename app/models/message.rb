@@ -47,6 +47,10 @@ class Message
 
   def subscribe_weather_response
     user.subscribe_weather_report!
+    SendFbMessageJob.perform_later(
+      user.facebook_id,
+      { text: I18n.t('bot.subscription_successfully') }
+    )
   end
 
   def unsubscribe_weather_response
