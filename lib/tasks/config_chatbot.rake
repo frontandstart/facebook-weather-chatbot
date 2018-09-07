@@ -28,15 +28,21 @@ namespace :config_chatbot do
                 payload: 'edit_location'
               },
               {
-                title: 'Subscribe daily report',
-                type: 'postback',
-                payload: 'subscribe_weather'
-              },
-              {
-                title: 'Subscribe daily report',
-                type: 'postback',
-                payload: 'unsubscribe_weather'
-              },
+                "title":"Daily report",
+                "type":"nested",
+                "call_to_actions":[
+                  {
+                    title: 'Subscribe',
+                    type: 'postback',
+                    payload: 'subscribe_weather'
+                  },
+                  {
+                    title: 'Unsubscribe',
+                    type: 'postback',
+                    payload: 'unsubscribe_weather'
+                  }
+                ]
+              }
             ]
           }
         ]

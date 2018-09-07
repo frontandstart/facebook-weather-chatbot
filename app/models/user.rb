@@ -35,7 +35,11 @@ class User
 
   def subscribe_weather_report!
     job = ScheduleMessageJob.set(wait: 24.hours).perform_later(facebook_id)
-    Rails.logger.debug "job.provider_job_id: #{job.inspect}"
+    update(daily_weather_report_jid: job.provider_job_id)
+    SendFbMessageJob.perform_later(
+      facebook_id,
+      I18n.t('bot.subscribtion_successfull')
+    )
   end
 
   def weather_report_response!
@@ -50,8 +54,9 @@ class User
   end
 
   def unsubscribe_weather_report!
-    update(provider_job_id: nil)
-    Sidekiq::ScheduledSet.new.find_job([provider_job_id]).delete
+    require 'sidekiq/api'
+    Sidekiq::ScheduledSet.new.find_job('').delete
+    update(daily_weather_report_jid: nil)
   end
     
   def need_update_temperature?
