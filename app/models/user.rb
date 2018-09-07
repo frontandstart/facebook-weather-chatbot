@@ -41,10 +41,6 @@ class User
   def unsubscribe_weather_report!
     Sidekiq::ScheduledSet.new.find_job(daily_weather_report_jid).delete
     update(daily_weather_report_jid: nil)
-    SendFbMessageJob.perform_later(
-      facebook_id,
-      { test: I18n.t('bot.unsubscription_successfull') }
-    )
   end
 
   def create_schedule_report_job
