@@ -15,4 +15,4 @@ en:
     cant_get_weather_data: "Sorry, we can't get current wather. Try repeat later"
     
     unsubscription_successfull: "You unsubscribed from daily weather report"
-    subscription_successfully: "You subscribed to daily weather report"
+    subscription_successfully: "You subscribed to daily weather report. Next will be at %{time}."
