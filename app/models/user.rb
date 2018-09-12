@@ -40,7 +40,7 @@ class User
   end
 
   def unsubscribe_weather_report!
-    if daily_weather_report_jid
+    if daily_weather_report_jid.present?
       job = Sidekiq::ScheduledSet.new.find_job(daily_weather_report_jid)
       job.delete
       update(daily_weather_report_jid: nil)

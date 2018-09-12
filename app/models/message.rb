@@ -64,9 +64,7 @@ class Message
   def test_response
     SendFbMessageJob.perform_later(
       user.facebook_id, 
-      {
-        text: 'test_response'
-      }
+      { text: 'test_response' }
     )
   end
 
